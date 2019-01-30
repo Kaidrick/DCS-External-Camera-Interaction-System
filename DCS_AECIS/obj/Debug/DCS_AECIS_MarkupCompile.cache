@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\Administrator\Documents\GitHub\DCS-External-Camera-Interaction-System\DCS_AECIS\App.xaml
-5-818043628
+51222291523
 
-28-690774142
+28-538974623
 301900305709
-MainWindow.xaml;Joystick.xaml;RangeSlider.xaml;RoundCheckBox.xaml;RoundSlider.xaml;
+MainWindow.xaml;UserControls\Joystick.xaml;UserControls\RangeSlider.xaml;UserControls\RoundCheckBox.xaml;UserControls\RoundSlider.xaml;
 
 False
 
