@@ -11,6 +11,7 @@ In your file explorer, right click and choose New > Text Document. Then rename t
 Add this line of code in your Export.lua, preferably at the end.
 
 `-- AECIS
+
 local dcsAECIS=require('lfs');dofile(dcsAECIS.writedir()..[[Scripts\DCS-AECIS.lua]])`
 
 This told DCS to load AECIS in its own namespace/table.
