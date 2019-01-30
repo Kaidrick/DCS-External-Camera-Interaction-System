@@ -2,16 +2,32 @@ local AECIS = {}
 
 AECIS.PORT = 3012
 
-package.path = package.path .. ";.\\LuaSocket\\?.lua"
-package.cpath = package.cpath .. ";.\\LuaSocket\\?.dll"
+package.path = package.path .. ";./LuaSocket/?.lua"
+package.path = package.path .. ";./Scripts/?.lua"
+package.cpath = package.cpath .. ";./LuaSocket/?.dll"
 
 AECIS.socket = require("socket")
--- local JSON = loadfile("Scripts\\JSON.lua")
 AECIS.JSON = require("JSON")
-AECIS.inspect = require("inspect")
 
 AECIS.client = nil
 AECIS.server = nil
+
+------------------------------------------------------------------------------
+-- Prev Export functions
+local _prevExport = {}
+_prevExport.LuaExportActivityNextEvent = LuaExportActivityNextEvent
+_prevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
+_prevExport.LuaExportStart = LuaExportStart
+_prevExport.LuaExportStop = LuaExportStop
+
+
+local inertia_delta = nil
+local inertia_angle_delta = nil
+
+-- stop zoom before set new command based on zoom_level?
+AECIS.model_iteration_count = 0  -- interval is 0.01 second
+AECIS.camera_zoom_count = 0
+AECIS.camera_zoom_direction = 0  -- 1 or 0 or -1?
 
 
 AECIS.logFile = io.open(lfs.writedir()..[[Logs\DCS-AECIS.log]], "w")
@@ -21,17 +37,6 @@ function AECIS.log(str)
 		AECIS.logFile:flush()
 	end
 end
-
-------------------------------------------------------------------------------
--- Prev Export functions
-local _prevExport = {}
-_prevExport.LuaExportActivityNextEvent = LuaExportActivityNextEvent
-_prevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
-
-
-------------------------------------------------------------------------------
-local inertia_delta = nil
-local inertia_angle_delta = nil
 
 function setNewCamera(camera_delta)  -- new camera is a table, instruction should be discrete
 	--[[
@@ -87,44 +92,6 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 	cp.p.y = cp.p.y + p.y
 	cp.p.z = cp.p.z + p.z
 	
-	
-	--[[
-	{
-		"p":{"x":-284578.75921297,"y":46.800839749685,"z":682410.81990607},
-		"x":{"x":-0.13895290340532,"y":0.051748726728522,"z":0.98894598432736},
-		"y":{"x":0.0072002832193547,"y":0.99866013702459,"z":-0.051245357249065},
-		"z":{"x":-0.99027281420667,"y":0.0,"z":-0.13913933104341}
-	}
-	
-	--]]
-	
-	
-	-- add delta to X  --> since X Y and Z are correlated, what if invalid value?
-	-- cp.x.x = cp.x.x + x.x
-	-- cp.x.y = cp.x.y + x.y
-	-- cp.x.z = cp.x.z + x.z
-	-- cp.x.x = 0
-	-- cp.x.y = 0
-	-- cp.x.z = 1
-	
-	-- add delta to Y
-	-- cp.y.x = cp.y.x + y.x
-	-- cp.y.y = cp.y.y + y.y
-	-- cp.y.z = cp.y.z + y.z
-	-- cp.y.x = 0
-	-- cp.y.y = 1
-	-- cp.y.z = 0
-	
-	-- add delta to Z
-	-- cp.z.x = cp.z.x + z.x
-	-- cp.z.y = cp.z.y + z.y
-	-- cp.z.z = cp.z.z + z.z
-	-- cp.z.x = 1  -- -1
-	-- cp.z.y = 0
-	-- cp.z.z = 0
-	
-	
-	
 	inertia_delta = camera_delta  -- save this valid camera delta
 	
 	-- save params only if it's not null <-- nil
@@ -141,11 +108,9 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 			
 			---[[
 			-- camera rotation control
-			
-			-- very sluggish on high speed, need to investigate
-			
+			-- camera rotation very sluggish on high movement speed, need to investigate
+			-- very sluggish even if vector logic is put in lua
 			if cmd == 1 then
-				--AECIS.log(AECIS.inspect(params))
 				if params and type(params[1]) == 'number' and type(params[2]) == 'number' then
 					-- valid, can set angle
 					LoSetCommand(2007, params[1] * 0.001) -- 
@@ -177,27 +142,8 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 		AECIS.log(err)
 	end
 	
-	
-	-- local cp = current_camera_position
-	
-	-- set position movement
-	-- set x movement
-	-- set y movement
-	-- set z movement
-	
-	-- cp.z.x = cp.z.x + math.pi / 72  -- plus 5 degree in some way?
-	-- cp.z.y = cp.z.y
-	-- cp.z.z = cp.z.z + math.pi / 72 -- 
-	
-	-- direct control (obsolete)
-	-- LoSetCameraPosition(camera_delta)
-	
 end
 
--- stop zoom before set new command based on zoom_level?
-AECIS.model_iteration_count = 0  -- interval is 0.01 second
-AECIS.camera_zoom_count = 0
-AECIS.camera_zoom_direction = 0  -- 1 or 0 or -1?
 
 function AECIS.cameraCheckZoomDirection(zoom_level)
 	local direction = zoom_level * AECIS.camera_zoom_direction
@@ -222,21 +168,21 @@ function AECIS.cameraAdjustZoomSpeed(zoom_level)
 	-- how many times to block in 100 iterations? from 0 time(s) to 100 time(s)
 	--                                               if zoom max     if zoom very small
 	
-	-- FIXME: MODULAR IS EXPENSIVE!
+	-- FIXME: very sluggish zoom on third detent? blocking to few? not sync to input rate?
 	
 	local zoom_step = math.abs(zoom_level) * 100  -- at this step, block?
 	if zoom_step > 0 and zoom_step < 20 then  -- low zoom speed, block every 1 iteration
 		LoSetCommand(335)  -- block 100 times
 	elseif zoom_step >= 20 and zoom_step < 40 then  -- low zoom speed, block every 10 iteration?
-		if AECIS.model_iteration_count % 5 == 0 then  -- block 20 times
+		if AECIS.model_iteration_count % 4 == 0 then  -- block 20 times
 			LoSetCommand(335)  -- block
 		end
 	elseif zoom_step >= 40 and zoom_step < 60 then  -- medium zoom speed, block every 25 teration?
-		if AECIS.model_iteration_count % 10 == 0 then  -- block 10 times
+		if AECIS.model_iteration_count % 8 == 0 then  -- block 10 times
 			LoSetCommand(335)  -- block
 		end
 	elseif zoom_step >= 60 and zoom_step < 80 then -- high zoom speed, bloack every 50 iteration?
-		if AECIS.model_iteration_count % 20 == 0 then  -- block 5 times
+		if AECIS.model_iteration_count % 12 == 0 then  -- block 5 times
 			LoSetCommand(335)  -- block
 		end
 	elseif zoom_step >= 80 and zoom_step <= 100 then  -- max zoom speed, dont block at all?
@@ -265,9 +211,6 @@ function AECIS.cameraZoom(zoom_level)  -- what is value change direction? very s
 end
 
 
-
----------------------------------------------------------
-
 function AECIS.step()
 	if AECIS.server then
 		AECIS.server:settimeout(0.001)  -- give up if no connection from a client
@@ -291,6 +234,7 @@ function AECIS.step()
 				)
 				if success then  -- run request
 					setNewCamera(res)
+					--SetCamera(res)
 				else
 					AECIS.log(res)  -- print JSON decode error to log
 				end
@@ -299,18 +243,29 @@ function AECIS.step()
 		else  -- no connection from client
 			-- keep moving camera
 			setNewCamera(nil)
-			log("No connection. Keep Inertia")
+			--SetCamera(nil)
+			--log("No connection. Keep Inertia")
 		end
 	end
 end
 
 
---------------------------------------------------------------
 function LuaExportStart()
 	AECIS.server = assert(AECIS.socket.bind("127.0.0.1", AECIS.PORT))
 	AECIS.server:settimeout(0.001)  -- give up if not connection from a client is made
 	local ip, port = AECIS.server:getsockname()
 	AECIS.log("AECIS: Server Started on Port " .. port .. " at " .. ip)
+	
+	_status,_result = pcall(function()
+        -- Call original function if it exists
+        if _prevExport.LuaExportStart then
+            _prevExport.LuaExportStart()
+        end
+    end)
+	
+	if not _status then
+        AECIS.log('ERROR Calling other LuaExportStart from another script: ' .. _result)
+    end
 	
 end
 
@@ -318,6 +273,17 @@ function LuaExportStop()
 	AECIS.client = nil
 	AECIS.server:close()
 	AECIS.log("AECIS Server Shutdown")
+	
+	_status,_result = pcall(function()
+        -- Call original function if it exists
+        if _prevExport.LuaExportStop then
+            _prevExport.LuaExportStop()
+        end
+    end)
+	
+	if not _status then
+        AECIS.log('ERROR Calling other LuaExportStop from another script: ' .. _result)
+    end
 end
 
 
@@ -349,15 +315,11 @@ function LuaExportActivityNextEvent(t)
     end)
 	
 	if not _status then
-        SR.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
+        AECIS.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
     end
 		
 	tNext = tNext + 0.01  -- test interval
 	return tNext
 end
-
-
-
-
 
 AECIS.log("DCS-Advanced External Camera Interaction System => Loaded")
