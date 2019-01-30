@@ -20,4 +20,4 @@ After you start a mission, press F11 or LCtrl+F11 to switch to external camera. 
 
 **Press and Hold LCtrl and drag with mouse to change window position.**
 
-[User Interface](overview.png)
+![User Interface](overview.png)
