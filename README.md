@@ -10,9 +10,10 @@ In your file explorer, right click and choose New > Text Document. Then rename t
 
 Add this line of code in your Export.lua, preferably at the end.
 
-`-- AECIS
 
-local dcsAECIS=require('lfs');dofile(dcsAECIS.writedir()..[[Scripts\DCS-AECIS.lua]])`
+`-- AECIS`
+
+`local dcsAECIS=require('lfs');dofile(dcsAECIS.writedir()..[[Scripts\DCS-AECIS.lua]])`
 
 This told DCS to load AECIS in its own namespace/table.
 After you start a mission, press F11 or LCtrl+F11 to switch to external camera. Press 'Connect' to try connecting to DCS. If the button changes to 'Disconnect', it means the TCP connection has been establish the Export function are working properly.
