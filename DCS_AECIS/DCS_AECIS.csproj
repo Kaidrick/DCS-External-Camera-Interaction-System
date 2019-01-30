@@ -96,14 +96,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CameraControl.cs" />
+    <Compile Include="garbages\CameraControl.cs" />
     <Compile Include="Model\Camera.cs" />
     <Compile Include="Model\CameraController.cs" />
     <Compile Include="Model\CameraData.cs" />
     <Compile Include="Model\CameraDataDisplayer.cs" />
     <Compile Include="Model\SetCamera.cs" />
     <Compile Include="Model\DataUpdater.cs" />
-    <Compile Include="Joystick.xaml.cs">
+    <Compile Include="UserControls\Joystick.xaml.cs">
       <DependentUpon>Joystick.xaml</DependentUpon>
     </Compile>
     <Compile Include="MouseBehaviour.cs" />
@@ -112,13 +112,13 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="RangeSlider.xaml.cs">
+    <Compile Include="UserControls\RangeSlider.xaml.cs">
       <DependentUpon>RangeSlider.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RoundCheckBox.xaml.cs">
+    <Compile Include="UserControls\RoundCheckBox.xaml.cs">
       <DependentUpon>RoundCheckBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RoundSlider.xaml.cs">
+    <Compile Include="UserControls\RoundSlider.xaml.cs">
       <DependentUpon>RoundSlider.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\CameraControllerViewModel.cs" />
@@ -127,9 +127,9 @@
     <Compile Include="garbages\SetXYZ.cs" />
     <Compile Include="Model\DcsCameraData.cs" />
     <Compile Include="ViewModel\DataUpdaterViewModel.cs" />
-    <Compile Include="VirtualController.cs" />
-    <Compile Include="VirtualJoystick.cs" />
-    <Compile Include="VirtualSlider.cs" />
+    <Compile Include="garbages\VirtualController.cs" />
+    <Compile Include="garbages\VirtualJoystick.cs" />
+    <Compile Include="garbages\VirtualSlider.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -138,24 +138,24 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GameCamera.cs" />
+    <Compile Include="garbages\GameCamera.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Joystick.xaml">
+    <Page Include="UserControls\Joystick.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RangeSlider.xaml">
+    <Page Include="UserControls\RangeSlider.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RoundCheckBox.xaml">
+    <Page Include="UserControls\RoundCheckBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RoundSlider.xaml">
+    <Page Include="UserControls\RoundSlider.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
