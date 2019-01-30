@@ -1,4 +1,6 @@
 # DCS-External-Camera-Interaction-System
+[点此阅读简体中文版说明](README_zh-CN.md)
+
 Very early implementation of a camera control concept for DCS World, built in C# WPF.
 
 **How to intall to DCS**
