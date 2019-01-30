@@ -60,8 +60,8 @@ namespace DCS_AECIS
 
         public MainWindow()
         {
-            //System.Threading.Thread.CurrentThread.CurrentUICulture =
-            //    new System.Globalization.CultureInfo("zh-CN");
+            System.Threading.Thread.CurrentThread.CurrentUICulture =
+                new System.Globalization.CultureInfo("zh-CN");
 
 
             InitializeComponent();
