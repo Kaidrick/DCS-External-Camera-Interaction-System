@@ -48,7 +48,7 @@ namespace DCS_AECIS.ViewModel
             //m_GlobalHook.MouseMove += M_GlobalHook_MouseMove;
             m_GlobalHook.MouseMoveExt += M_GlobalHook_MouseMoveExt;
 
-            System.Windows.MessageBox.Show("Successfully subscribed to MouseKeyboardEvent");
+            //System.Windows.MessageBox.Show("Successfully subscribed to MouseKeyboardEvent");
         }
 
         #region KeyboardEvents
@@ -188,11 +188,11 @@ namespace DCS_AECIS.ViewModel
             try
             {
                 Unsubscribe();
-                System.Windows.MessageBox.Show("Global Mouse and Keyboard Events Unsubscribed");
+                //System.Windows.MessageBox.Show("Global Mouse and Keyboard Events Unsubscribed");
             }
             catch(Exception)
             {
-                System.Windows.MessageBox.Show("Failed to Unsubscribe MouseKeyboardEvent Hook. Maybe it's already unhooked?");
+                //System.Windows.MessageBox.Show("Failed to Unsubscribe MouseKeyboardEvent Hook. Maybe it's already unhooked?");
             }
             
         }
@@ -376,8 +376,8 @@ namespace DCS_AECIS.ViewModel
         public ICommand BtnMoveRight    { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Right); } }
         public ICommand BtnStopMove     { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Stop); }}
 
-        public ICommand BtnSubscribe { get { return new ButtonCommand(Subscribe); } }
-        public ICommand BtnUnsubscribe { get { return new ButtonCommand(DisplayerWindowsClose); } }
+        public ICommand BtnSubscribe    { get { return new ButtonCommand(Subscribe); } }
+        public ICommand BtnUnsubscribe  { get { return new ButtonCommand(DisplayerWindowsClose); } }
 
 
         
@@ -574,6 +574,9 @@ namespace DCS_AECIS.ViewModel
                 connectedCheck = false;
                 _dataDisplayer.DisplayerConnected = false;
                 System.Windows.MessageBox.Show(exception.ToString());
+                // abort connection here?
+                _timer.Stop();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockDcsConnected"));
             }
 
             if (connectedCheck)

@@ -37,7 +37,18 @@ namespace DCS_AECIS
 
         // Register Dependency Property
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(RoundSlider));
-        public static readonly DependencyProperty StickyControlProperty = DependencyProperty.Register("StickyControl", typeof(bool), typeof(RoundSlider));
+        public static readonly DependencyProperty StickyControlProperty = DependencyProperty.Register("StickyControl", typeof(bool), typeof(RoundSlider), new PropertyMetadata(StickyCameraPropertyChanged));
+
+        private static void StickyCameraPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            //throw new NotImplementedException();
+            var control = (RoundSlider)d;
+
+            Canvas.SetLeft(control.EllipseSliderKnob, control.controlInitCanvasLeft);
+            Canvas.SetTop(control.EllipseSliderKnob, control.controlInitCanvasTop);
+
+            control.Value = 0;
+        }
 
         public double Value
         {
