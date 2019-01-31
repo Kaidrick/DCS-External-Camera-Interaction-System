@@ -21,7 +21,7 @@ namespace DCS_AECIS.Model
         public bool DisplayerConnected { get; set; } = false;
         public int DisplayerUpdatedInterval { get; set; } = 10;  // in millisecond(s)
         public string IPAddress { get; set; } = "127.0.0.1";
-        public int Port { get; set; } = 3012;
+        public int Port { get; set; } = 31549;
 
         /// <summary>
         /// This method use JsonConvert.Deserialize to parse a json string containing camera data
