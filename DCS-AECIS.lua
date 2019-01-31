@@ -1,6 +1,6 @@
 local AECIS = {}
 
-AECIS.PORT = 3012
+AECIS.PORT = 31549
 
 package.path = package.path .. ";./LuaSocket/?.lua"
 package.path = package.path .. ";./Scripts/?.lua"
@@ -8,6 +8,7 @@ package.cpath = package.cpath .. ";./LuaSocket/?.dll"
 
 AECIS.socket = require("socket")
 AECIS.JSON = require("JSON")
+require("Vector")
 
 AECIS.client = nil
 AECIS.server = nil
@@ -41,6 +42,16 @@ end
 function setNewCamera(camera_delta)  -- new camera is a table, instruction should be discrete
 	--[[
 	camera_delta contains the camera movement delta
+	
+	camera_delta = {
+		dX  -- forward or backward  --> -1 <= value <= 1
+		dY  -- up or down
+		dZ  -- left or right
+		
+		action  -- like, switching views
+	}
+	
+	
 	camera_delta = {
 		p = {
 			x = dx,
@@ -62,7 +73,7 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 	-- rate control
 	
 	-- get current camera position
-	local cp = LoGetCameraPosition()
+	
 	
 	-- check if data is valid, especially position --> p
 	if not camera_delta or camera_delta.p.x == 'NaN' or camera_delta.p.y == 'NaN' or camera_delta.p.z == 'NaN' then
@@ -75,6 +86,39 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 			return
 		end
 	end
+	
+	
+	
+	
+	dX = camera_delta.dX
+	dY = camera_delta.dY
+	dZ = camera_delta.dZ
+	
+	local cp = LoGetCameraPosition()
+	
+	local X = Vector(cp.x.x, cp.x.y, cp.x.z)
+	local Y = Vector(cp.y.x, cp.y.y, cp.y.z)
+	local Z = Vector(cp.z.x, cp.z.y, cp.z.z)
+	local P = Vector(cp.p.x, cp.p.y, cp.p.z)  -- Camera Position in LO coordinates
+	
+	mX = X * dX
+	mY = Y * dY
+	mZ = Z * dZ
+	
+	P = P + mX
+	P = P + mY
+	P = P + mZ
+	
+	local new_camera_pos = {
+		x = cp.x,
+		y = cp.y,
+		z = cp.z,
+		p = {
+			x = P.x,
+			y = P.y,
+			z = P.z
+		}
+	}
 	
 	-- otherwise if code reaches here, either camera_delta is refreshed or camera_delta is inertia_delta
 	local p = camera_delta.p
@@ -101,7 +145,8 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 	
 	local success, err = pcall(
 		function() 
-			LoSetCameraPosition(cp)  -- try set new camera position
+			--LoSetCameraPosition(cp)  -- try set new camera position
+			LoSetCameraPosition(new_camera_pos)
 			-- command = 2007 - mouse camera rotate left/right  
 			-- command = 2008 - mouse camera rotate up/down
 			-- command = 2009 - mouse camera zoom 
