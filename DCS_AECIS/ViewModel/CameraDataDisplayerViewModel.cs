@@ -180,6 +180,8 @@ namespace DCS_AECIS.ViewModel
             m_GlobalHook.Dispose();
         }
 
+        #endregion
+
         // Fire ICommand on window close
         public ICommand WindowClosing { get { return new ButtonCommand(DisplayerWindowsClose); } }
 
@@ -199,7 +201,6 @@ namespace DCS_AECIS.ViewModel
         }
 
 
-        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -563,7 +564,7 @@ namespace DCS_AECIS.ViewModel
                 }
                 else
                 {
-                    DisplayerWindowsClose();
+                    Unsubscribe();
                 }
             }
 
@@ -723,47 +724,5 @@ namespace DCS_AECIS.ViewModel
                 task();
             }
         }
-
-        //class ButtonConnectCommand : ICommand
-        //{
-        //    private CameraDataDisplayerViewModel _displayerViewModel;
-        //    public ButtonConnectCommand(CameraDataDisplayerViewModel displayerViewModel)
-        //    {
-        //        _displayerViewModel = displayerViewModel;
-        //    }
-
-        //    public event EventHandler CanExecuteChanged;
-
-        //    public bool CanExecute(object parameter)
-        //    {
-        //        return true;
-        //    }
-
-        //    public void Execute(object parameter)
-        //    {
-        //        _displayerViewModel.DataDisplayerStartUpdate();
-        //    }
-        //}
-
-        //class ButtonDisconnectCommand : ICommand
-        //{
-        //    private CameraDataDisplayerViewModel _displayerViewModel;
-        //    public ButtonDisconnectCommand(CameraDataDisplayerViewModel displayerViewModel)
-        //    {
-        //        _displayerViewModel = displayerViewModel;
-        //    }
-
-        //    public event EventHandler CanExecuteChanged;
-
-        //    public bool CanExecute(object parameter)
-        //    {
-        //        return true;
-        //    }
-
-        //    public void Execute(object parameter)
-        //    {
-        //        _displayerViewModel.DataDisplayerStopUpdate();
-        //    }
-        //}
     }
 }

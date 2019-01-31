@@ -94,11 +94,17 @@ namespace DCS_AECIS.Model
                 var strengthBasedMovement = camVector.ScaleBy(strength);
                 setCamera.P.X = MaxMovementSpeed * MovementSpeed * strengthBasedMovement.X;  // direction * distance rate
                 setCamera.P.Z = MaxMovementSpeed * MovementSpeed * strengthBasedMovement.Z;
+
+                setCamera.DirectionalMovement = LeftJoystickVerticalMovement * MaxMovementSpeed * MovementSpeed;
+                setCamera.HorizontalMovement = LeftJoystickHorizontalMovement * MaxMovementSpeed * MovementSpeed;
             }
             else  // both are zero, no movement
             {
                 setCamera.P.X = 0;  // direction * distance rate
                 setCamera.P.Z = 0;
+
+                setCamera.DirectionalMovement = 0;
+                setCamera.HorizontalMovement = 0;
             }
             // else joystick no movement, do nothing
         }
@@ -134,6 +140,8 @@ namespace DCS_AECIS.Model
         {
             // add height change to current setCamera
             setCamera.P.Y = MaxVerticalSpeed * HeightChangeRate * VerticalSpeed;
+
+            setCamera.VerticalMovement = MaxVerticalSpeed * HeightChangeRate * VerticalSpeed;
         }
 
         

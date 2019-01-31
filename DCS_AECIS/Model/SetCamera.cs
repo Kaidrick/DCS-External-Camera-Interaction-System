@@ -10,6 +10,14 @@ namespace DCS_AECIS.Model
     class SetCamera : CameraData
     {
         //public SetCamera() : base() { }
+        [JsonProperty("dX")]
+        public double DirectionalMovement { get; set; }
+
+        [JsonProperty("dZ")]
+        public double HorizontalMovement { get; set; }
+
+        [JsonProperty("dY")]
+        public double VerticalMovement { get; set; }
 
         [JsonProperty("command")]
         public int CameraCommand { get; set; }
