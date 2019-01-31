@@ -185,6 +185,7 @@ namespace DCS_AECIS.ViewModel
 
         private void DisplayerWindowsClose()
         {
+            _timer.Stop();
             try
             {
                 Unsubscribe();
@@ -377,7 +378,7 @@ namespace DCS_AECIS.ViewModel
         public ICommand BtnStopMove     { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Stop); }}
 
         public ICommand BtnSubscribe    { get { return new ButtonCommand(Subscribe); } }
-        public ICommand BtnUnsubscribe  { get { return new ButtonCommand(DisplayerWindowsClose); } }
+        public ICommand BtnUnsubscribe  { get { return new ButtonCommand(Unsubscribe); } }
 
 
         
@@ -559,6 +560,8 @@ namespace DCS_AECIS.ViewModel
             {
                 TcpClient client = new TcpClient(_dataDisplayer.IPAddress, _dataDisplayer.Port);
                 NetworkStream nws = client.GetStream();
+                nws.WriteTimeout = 100;
+                nws.ReadTimeout = 100;
 
                 StreamReader reader = new StreamReader(nws);
                 writer = new StreamWriter(nws) { AutoFlush = true };
@@ -573,7 +576,7 @@ namespace DCS_AECIS.ViewModel
                 jsonCameraData = null;
                 connectedCheck = false;
                 _dataDisplayer.DisplayerConnected = false;
-                System.Windows.MessageBox.Show(exception.ToString());
+                //System.Windows.MessageBox.Show(exception.ToString());
                 // abort connection here?
                 _timer.Stop();
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockDcsConnected"));
