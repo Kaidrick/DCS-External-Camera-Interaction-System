@@ -159,7 +159,7 @@ namespace DCS_AECIS.ViewModel
             mouseLastX = e.X;
             mouseLastY = e.Y;
         }
-        
+
         #endregion
 
         public void Unsubscribe()
@@ -191,11 +191,11 @@ namespace DCS_AECIS.ViewModel
                 Unsubscribe();
                 //System.Windows.MessageBox.Show("Global Mouse and Keyboard Events Unsubscribed");
             }
-            catch(Exception)
+            catch (Exception)
             {
                 //System.Windows.MessageBox.Show("Failed to Unsubscribe MouseKeyboardEvent Hook. Maybe it's already unhooked?");
             }
-            
+
         }
 
 
@@ -300,6 +300,34 @@ namespace DCS_AECIS.ViewModel
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HeightChangeCameraSlider"));
             }
         }
+
+        // data port
+        public int TcpDataPort
+        {
+            get
+            {
+                return _dataDisplayer.Port;
+            }
+            set
+            {
+                _dataDisplayer.Port = Convert.ToInt32(value);
+            }
+        }
+
+        public bool CanChangeConnectionData
+        {
+            get
+            {
+                if (_dataDisplayer.DisplayerConnected)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
         #endregion
 
         // Speed Control
@@ -324,7 +352,8 @@ namespace DCS_AECIS.ViewModel
         public string MaxMovementSpeed
         {
             get { return Convert.ToString(_cameraController.MaxMovementSpeed); }
-            set {
+            set
+            {
                 try
                 {
                     _cameraController.MaxMovementSpeed = Convert.ToDouble(value);
@@ -333,7 +362,8 @@ namespace DCS_AECIS.ViewModel
                 {
                     _cameraController.MaxMovementSpeed = 0;
                 }
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("MaxMovementSpeed")); }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("MaxMovementSpeed"));
+            }
         }
 
         public string MaxVerticalSpeed
@@ -365,23 +395,23 @@ namespace DCS_AECIS.ViewModel
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CameraForceFeedback"));
             }
         }
-        
+
         #endregion Databinding Properties
 
         // ICommand
         public ICommand BtnConnectClick { get { return new ButtonCommand(DataDisplayerConnectionControl); } }
 
-        public ICommand BtnMoveForward  { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Forward); }}
-        public ICommand BtnMoveBack     { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Back); } }
-        public ICommand BtnMoveLeft     { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Left); } }
-        public ICommand BtnMoveRight    { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Right); } }
-        public ICommand BtnStopMove     { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Stop); }}
+        public ICommand BtnMoveForward { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Forward); } }
+        public ICommand BtnMoveBack { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Back); } }
+        public ICommand BtnMoveLeft { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Left); } }
+        public ICommand BtnMoveRight { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Right); } }
+        public ICommand BtnStopMove { get { return new ButtonCommand(DataDisplayerDirectCameraControl_Stop); } }
 
-        public ICommand BtnSubscribe    { get { return new ButtonCommand(Subscribe); } }
-        public ICommand BtnUnsubscribe  { get { return new ButtonCommand(Unsubscribe); } }
+        public ICommand BtnSubscribe { get { return new ButtonCommand(Subscribe); } }
+        public ICommand BtnUnsubscribe { get { return new ButtonCommand(Unsubscribe); } }
 
 
-        
+
         public bool Experimental_MouseKeyboardControl
         {
             get
@@ -527,7 +557,7 @@ namespace DCS_AECIS.ViewModel
 
             if (e.PropertyName == "Experimental_MouseKeyboardControl")
             {
-                if(Experimental_MouseKeyboardControl)  // hook enabled
+                if (Experimental_MouseKeyboardControl)  // hook enabled
                 {
                     Subscribe();
                 }
@@ -580,6 +610,7 @@ namespace DCS_AECIS.ViewModel
                 // abort connection here?
                 _timer.Stop();
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockDcsConnected"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CanChangeConnectionData")); 
             }
 
             if (connectedCheck)
@@ -591,14 +622,16 @@ namespace DCS_AECIS.ViewModel
 
                 //_cameraController.PrepareSetCamera(_dataDisplayer.camera);  -- WRONG
 
-                
+
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockDcsConnected"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CanChangeConnectionData"));
+
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockCameraPosition"));
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockCameraHeading"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockCameraRoll"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockCameraPitch"));
-                
+
 
                 // SETCAMERA IS A DELTA VALUE, NOT CAMERA DATA VALUE
 
@@ -609,10 +642,10 @@ namespace DCS_AECIS.ViewModel
 
                 _dataDisplayer.DisplayerConnected = true;
             }
-            
+
         }
 
-     
+
 
         public void DataDisplayerConnectionControl()  // control connect and disconnect
         {
@@ -628,6 +661,7 @@ namespace DCS_AECIS.ViewModel
                 _dataDisplayer.DisplayerConnected = false;
             }
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockDcsConnected"));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CanChangeConnectionData"));
         }
 
 
@@ -662,7 +696,7 @@ namespace DCS_AECIS.ViewModel
         }
 
 
-        class ButtonCommand: ICommand
+        class ButtonCommand : ICommand
         {
             private Action task;
             //private Func<bool> commit;

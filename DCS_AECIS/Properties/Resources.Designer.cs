@@ -124,6 +124,15 @@ namespace DCS_AECIS.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Port.
+        /// </summary>
+        public static string data_port {
+            get {
+                return ResourceManager.GetString("data_port", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disconnect.
         /// </summary>
         public static string disconnect {

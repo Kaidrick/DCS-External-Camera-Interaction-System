@@ -138,6 +138,9 @@
   <data name="connect" xml:space="preserve">
     <value>Connect</value>
   </data>
+  <data name="data_port" xml:space="preserve">
+    <value>Port</value>
+  </data>
   <data name="disconnect" xml:space="preserve">
     <value>Disconnect</value>
   </data>
