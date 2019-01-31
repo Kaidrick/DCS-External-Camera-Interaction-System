@@ -174,15 +174,15 @@ function AECIS.cameraAdjustZoomSpeed(zoom_level)
 	if zoom_step > 0 and zoom_step < 20 then  -- low zoom speed, block every 1 iteration
 		LoSetCommand(335)  -- block 100 times
 	elseif zoom_step >= 20 and zoom_step < 40 then  -- low zoom speed, block every 10 iteration?
-		if AECIS.model_iteration_count % 4 == 0 then  -- block 20 times
+		if AECIS.model_iteration_count % 5 == 0 then  -- block 20 times
 			LoSetCommand(335)  -- block
 		end
 	elseif zoom_step >= 40 and zoom_step < 60 then  -- medium zoom speed, block every 25 teration?
-		if AECIS.model_iteration_count % 8 == 0 then  -- block 10 times
+		if AECIS.model_iteration_count % 10 == 0 then  -- block 10 times
 			LoSetCommand(335)  -- block
 		end
 	elseif zoom_step >= 60 and zoom_step < 80 then -- high zoom speed, bloack every 50 iteration?
-		if AECIS.model_iteration_count % 12 == 0 then  -- block 5 times
+		if AECIS.model_iteration_count % 20 == 0 then  -- block 5 times
 			LoSetCommand(335)  -- block
 		end
 	elseif zoom_step >= 80 and zoom_step <= 100 then  -- max zoom speed, dont block at all?
