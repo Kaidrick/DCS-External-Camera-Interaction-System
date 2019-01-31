@@ -25,6 +25,7 @@ local dcsAECIS=require('lfs');dofile(dcsAECIS.writedir()..[[Scripts\DCS-AECIS.lu
 
 I experienced none of above issue on my end though; need for information from users.
 
+
 **How to intall to DCS**
 
 It is necessary to add the following files to your ..\Users\\\<Your Username>\Saved Games\DCS\.\<Branch\>\Scripts
