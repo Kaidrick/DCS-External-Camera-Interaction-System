@@ -30,6 +30,13 @@ AECIS.model_iteration_count = 0  -- interval is 0.01 second
 AECIS.camera_zoom_count = 0
 AECIS.camera_zoom_direction = 0  -- 1 or 0 or -1?
 
+AECIS.cockpit_horizontal_move_count = 0
+AECIS.cockpit_vertical_move_count = 0
+
+local cockpit_zoom_value = 0  -- initial value is 0, no zoom
+
+local export_units = {}
+
 
 AECIS.logFile = io.open(lfs.writedir()..[[Logs\DCS-AECIS.log]], "w")
 function AECIS.log(str)
@@ -94,12 +101,32 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 	dY = camera_delta.dY
 	dZ = camera_delta.dZ
 	
+	local follow_orientation = camera_delta.o_f  -- true or false
+	
+	
 	local cp = LoGetCameraPosition()
 	
-	local X = Vector(cp.x.x, cp.x.y, cp.x.z)
-	local Y = Vector(cp.y.x, cp.y.y, cp.y.z)
-	local Z = Vector(cp.z.x, cp.z.y, cp.z.z)
-	local P = Vector(cp.p.x, cp.p.y, cp.p.z)  -- Camera Position in LO coordinates
+	local X
+	local Y
+	local Z
+	local P
+	
+	if follow_orientation then
+		X = Vector(cp.x.x, cp.x.y, cp.x.z)
+		Y = Vector(cp.y.x, cp.y.y, cp.y.z)
+		Z = Vector(cp.z.x, cp.z.y, cp.z.z)
+		P = Vector(cp.p.x, cp.p.y, cp.p.z)  -- Camera Position in LO coordinates
+		
+		-- TODO: independent y-axis movement?
+		
+	else  -- only move in x-z plane
+		X = Vector(cp.x.x, 0, cp.x.z)
+		Y = Vector(0, 1, 0)  -- y-axis
+		Z = Vector(cp.z.x, 0, cp.z.z)
+		P = Vector(cp.p.x, cp.p.y, cp.p.z)  -- Camera Position in LO coordinates
+	end
+	
+	
 	
 	mX = X * dX
 	mY = Y * dY
@@ -151,6 +178,35 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 			-- command = 2008 - mouse camera rotate up/down
 			-- command = 2009 - mouse camera zoom 
 			
+			-- test commands
+			
+			-- > 2012 iCommandViewZoomAbs -- cockpit zoom, negative decrease FOV, positive increase FOV
+			-- get zoom slider raw input
+			-- initial value == 0
+			-- zoom_value += slider_raw_input * 0.001,
+			-- how to control speed?
+			
+			-- limit zoom min and max, also, zoom value is inverted
+			if camera_delta.pit_cam then
+				cockpit_zoom_value = cockpit_zoom_value + camera_delta.zoom_raw * -0.01  -- zoom_raw is + or -
+				if cockpit_zoom_value > 1 then  -- set to 1
+					cockpit_zoom_value = 1
+				elseif cockpit_zoom_value < -1 then  -- set to -1
+					cockpit_zoom_value = -1
+				end
+				LoSetCommand(2012, cockpit_zoom_value)
+			end
+			
+			-- induce movement for cockpit view? this also message up free camera
+			-- need to disable these inputs when using external free camera
+			-- seperate control is a must
+			-- different aircraft has different behavior
+			if camera_delta.pit_cam then
+				LoSetCommand(2048, dZ * 0.001)
+				LoSetCommand(2050, dY * 0.001 * -1)
+				LoSetCommand(2052, dX * 0.001)
+			end
+			
 			---[[
 			-- camera rotation control
 			-- camera rotation very sluggish on high movement speed, need to investigate
@@ -160,12 +216,18 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 					-- valid, can set angle
 					LoSetCommand(2007, params[1] * 0.001) -- 
 					LoSetCommand(2008, params[2] * 0.001) -- 
+					if camera_delta.pit_cam then
+						LoSetCommand(2046, params[3])
+					end
 					AECIS.cameraZoom(zoom)
 					-- zoom
 				else  -- params does not exist for some reason?
 					if inertia_angle_delta then
 						LoSetCommand(2007, inertia_angle_delta[1] * 0.001) -- 
 						LoSetCommand(2008, inertia_angle_delta[2] * 0.001) -- 
+						if camera_delta.pit_cam then
+							LoSetCommand(2046, inertia_angle_delta[3]) -- 
+						end
 						AECIS.cameraZoom(zoom)
 					end
 					-- else do nothing
@@ -177,7 +239,10 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 					-- should stop at zero, keep rate
 					LoSetCommand(2007, inertia_angle_delta[1] * 0.001) --
 					LoSetCommand(2008, inertia_angle_delta[2] * 0.001) --
-					AECIS.cameraZoom(zoom) 
+					if camera_delta.pit_cam then
+						LoSetCommand(2046, inertia_angle_delta[3]) --
+					end
+					AECIS.cameraZoom(zoom)
 				end
 			end
 			--]]
@@ -188,6 +253,7 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 	end
 	
 end
+
 
 
 function AECIS.cameraCheckZoomDirection(zoom_level)
@@ -218,17 +284,21 @@ function AECIS.cameraAdjustZoomSpeed(zoom_level)
 	local zoom_step = math.abs(zoom_level) * 100  -- at this step, block?
 	if zoom_step > 0 and zoom_step < 20 then  -- low zoom speed, block every 1 iteration
 		LoSetCommand(335)  -- block 100 times
+
 	elseif zoom_step >= 20 and zoom_step < 40 then  -- low zoom speed, block every 10 iteration?
 		if AECIS.model_iteration_count % 5 == 0 then  -- block 20 times
 			LoSetCommand(335)  -- block
+
 		end
 	elseif zoom_step >= 40 and zoom_step < 60 then  -- medium zoom speed, block every 25 teration?
 		if AECIS.model_iteration_count % 10 == 0 then  -- block 10 times
 			LoSetCommand(335)  -- block
+
 		end
 	elseif zoom_step >= 60 and zoom_step < 80 then -- high zoom speed, bloack every 50 iteration?
 		if AECIS.model_iteration_count % 20 == 0 then  -- block 5 times
 			LoSetCommand(335)  -- block
+
 		end
 	elseif zoom_step >= 80 and zoom_step <= 100 then  -- max zoom speed, dont block at all?
 		-- No block -- block 0 times
@@ -240,18 +310,23 @@ function AECIS.cameraAdjustZoomSpeed(zoom_level)
 end
 
 function AECIS.cameraZoom(zoom_level)  -- what is value change direction? very slow if stop zoom
+	-- cockpit view zoom
+	
 	if zoom_level == 0 then
 		LoSetCommand(335)  -- Stop zoom in for external views
+
 		AECIS.camera_zoom_direction = 0
 	elseif zoom_level > 0 then
 		-- check if direction change
 		AECIS.cameraCheckZoomDirection(zoom_level)
-		AECIS.cameraAdjustZoomSpeed(zoom_level)
-		LoSetCommand(334)  -- Zoom in for external views 
+		AECIS.cameraAdjustZoomSpeed(zoom_level) 
+		LoSetCommand(334)  -- Zoom in for external views
+		
 	elseif zoom_level < 0 then
 		AECIS.cameraCheckZoomDirection(zoom_level)
 		AECIS.cameraAdjustZoomSpeed(zoom_level)
-		LoSetCommand(336)  -- Zoom out for external views 
+		LoSetCommand(336)  -- Zoom out for external views
+		
 	end
 end
 
@@ -264,7 +339,8 @@ function AECIS.step()
 		if AECIS.client then  -- if client is not nil, connection is made
 			AECIS.client:settimeout(0.001)
 			-- send camera data first
-			current_camera_position = LoGetCameraPosition()
+			local current_camera_position = LoGetCameraPosition()
+			
 			local cam_pos = AECIS.JSON:encode(current_camera_position)  -- encode a table to JSON string
 			AECIS.client:send(cam_pos .. "\n")
 			
@@ -347,21 +423,46 @@ function LuaExportBeforeNextFrame()
 end
 
 
+-- base timer is 0.01 second, step iterates 20 times is 0.2 second, 10 times is 0.1 second
+local _srs = false  -- SRS send every 0.2 second  <-- srs handles other exports
+local _helios = false  -- HELIOS send every 0.1 second
+
+local limit_step = 0
+
+
+function LuaExportAfterNextFrame()
+	export_units = LoGetWorldObjects()
+end
+
+
 function LuaExportActivityNextEvent(t)
+	-- local tNext = tCurrent + 0.1 -- for helios support
+    -- we only want to send once every 0.2 seconds 
+    -- but helios (and other exports) require data to come much faster
+    -- so we just flip a boolean every run through to reduce to 0.2 rather than 0.1 seconds
+
+
 	local tNext = t
 	AECIS.step()
 	
-	-- call
-    local _status,_result = pcall(function()
-        -- Call original function if it exists
-        if _prevExport.LuaExportActivityNextEvent then
-            _prevExport.LuaExportActivityNextEvent(t)
-        end
-    end)
-	
-	if not _status then
-        AECIS.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
-    end
+	-- call original function once every 20 iterations
+	limit_step = limit_step + 1 -- iter
+	if limit_step == 20 then
+		local _status,_result = pcall(function()
+			-- Call original function if it exists
+			if _prevExport.LuaExportActivityNextEvent then
+				_prevExport.LuaExportActivityNextEvent(t)
+			end
+		end)
+		
+		if not _status then
+			AECIS.log('ERROR Calling other LuaExportActivityNextEvent from another script: ' .. _result)
+		end
+		
+		-- reset limit_step to 0
+		limit_step = 20
+	end
+    
 		
 	tNext = tNext + 0.01  -- test interval
 	return tNext
