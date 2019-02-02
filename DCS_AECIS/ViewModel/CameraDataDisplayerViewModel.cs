@@ -302,6 +302,20 @@ namespace DCS_AECIS.ViewModel
             }
         }
 
+        public bool CameraOrientationFollowing
+        {
+            get
+            {
+                return _cameraController.IsMovementOrientationCorrelated;
+            }
+            set
+            {
+                _cameraController.IsMovementOrientationCorrelated = Convert.ToBoolean(value);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CameraOrientationFollowing"));
+            }
+        }
+
+
         // data port
         public int TcpDataPort
         {
@@ -331,6 +345,7 @@ namespace DCS_AECIS.ViewModel
         }
         #endregion
 
+        #region Camera Speed Control
         // Speed Control
         public double SpeedMovement
         {
@@ -383,6 +398,21 @@ namespace DCS_AECIS.ViewModel
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("MaxVerticalSpeed"));
             }
         }
+        #endregion Camera Speed Control
+
+        // test roll
+        public double CameraRoll
+        {
+            get
+            {
+                return _cameraController.RollSliderMovement;
+            }
+            set
+            {
+                _cameraController.RollSliderMovement = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CameraRoll"));
+            }
+        }
 
         public bool CameraForceFeedback
         {
@@ -394,6 +424,19 @@ namespace DCS_AECIS.ViewModel
             {
                 _cameraController.IsForceFeedback = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CameraForceFeedback"));
+            }
+        }
+
+        public bool EnableCockpitCameraControl
+        {
+            get
+            {
+                return _cameraController.UseCockpitCameraControl;
+            }
+            set
+            {
+                _cameraController.UseCockpitCameraControl = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EnableCockpitCameraControl"));
             }
         }
 
@@ -537,9 +580,8 @@ namespace DCS_AECIS.ViewModel
                 // MessageBox.Show(string.Format("{0} {1} {2}", _cameraController.setCamera.P.X, _cameraController.setCamera.P.Y, _cameraController.setCamera.P.Z));
             }
 
-            if (e.PropertyName == "JoystickRightVerticalMovement" || e.PropertyName == "JoystickRightHorizontalMovement")
+            if (e.PropertyName == "JoystickRightVerticalMovement" || e.PropertyName == "JoystickRightHorizontalMovement" || e.PropertyName == "CameraRoll")
             {
-                //throw new NotImplementedException();
                 // generate new set camera
                 _cameraController.RotateCamera();
                 // MessageBox.Show(string.Format("{0} {1} {2}", _cameraController.setCamera.P.X, _cameraController.setCamera.P.Y, _cameraController.setCamera.P.Z));
@@ -548,7 +590,6 @@ namespace DCS_AECIS.ViewModel
             if (e.PropertyName == "ZoomCameraSlider")
             {
                 _cameraController.ZoomCamera();
-                //throw new NotImplementedException();
             }
 
             if (e.PropertyName == "HeightChangeCameraSlider")
@@ -567,7 +608,6 @@ namespace DCS_AECIS.ViewModel
                     Unsubscribe();
                 }
             }
-
         }
 
 
@@ -601,7 +641,7 @@ namespace DCS_AECIS.ViewModel
 
                 connectedCheck = true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 writer = null;
                 jsonCameraData = null;

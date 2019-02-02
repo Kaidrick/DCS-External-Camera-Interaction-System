@@ -9,7 +9,7 @@
         xmlns:p="clr-namespace:DCS_AECIS.Properties"
         mc:Ignorable="d"
         
-        Title="AECIS" Height="514.874" Width="629.534" Foreground="{x:Null}" WindowStyle="None" Topmost="{Binding IsChecked, ElementName=WindowTopmostControl}" AllowsTransparency="True">
+        Title="AECIS" Height="514.874" Width="876.284" Foreground="{x:Null}" WindowStyle="None" Topmost="{Binding IsChecked, ElementName=WindowTopmostControl}" AllowsTransparency="True">
     <Window.Background>
         <SolidColorBrush Opacity="0.4" Color="#FF4D4D4D"/>
     </Window.Background>
@@ -28,13 +28,13 @@
     </i:Interaction.Triggers>
 
     <Grid>
-        <Label Content="{x:Static p:Resources.camera_movement_speed}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="-15,133,0,0" VerticalAlignment="Top" Foreground="White" Width="197"/>
-        <Label Content="{x:Static p:Resources.camera_alt_change_speed}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="-15,93,0,0" VerticalAlignment="Top" Foreground="White" Width="197"/>
-        <ucns:Joystick HorizontalAlignment="Left" Height="240" Margin="6,269,0,-30" VerticalAlignment="Top" Width="240" MoveHorizontal="{Binding JoystickLeftHorizontalMovement, Mode=TwoWay}" MoveVertical="{Binding JoystickLeftVerticalMovement, Mode=TwoWay}" CameraStickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <ucns:Joystick x:Name="Joystick_R" HorizontalAlignment="Left" Height="240" Margin="250,269,0,-30" VerticalAlignment="Top" Width="240" MoveHorizontal="{Binding JoystickRightHorizontalMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MoveVertical="{Binding JoystickRightVerticalMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CameraStickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <ucns:RoundSlider HorizontalAlignment="Left" Height="227" Margin="556,278,0,0" VerticalAlignment="Top" Width="57" Value="{Binding ZoomCameraSlider, Mode=TwoWay}" StickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <ucns:RoundSlider HorizontalAlignment="Left" Height="227" Margin="488,278,0,0" VerticalAlignment="Top" Width="57" Value="{Binding HeightChangeCameraSlider, Mode=TwoWay}" StickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <ucns:RangeSlider HorizontalAlignment="Left" Height="207" Margin="284,42,0,0" VerticalAlignment="Top" Width="27" RenderTransformOrigin="0.5,0.5" StickyControl="True" Value="{Binding SpeedMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <Label Content="{x:Static p:Resources.camera_movement_speed}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="309,92,0,0" VerticalAlignment="Top" Foreground="White" Width="197"/>
+        <Label Content="{x:Static p:Resources.camera_alt_change_speed}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="309,52,0,0" VerticalAlignment="Top" Foreground="White" Width="197"/>
+        <ucns:Joystick HorizontalAlignment="Left" Height="240" Margin="260,286,0,0" VerticalAlignment="Top" Width="240" MoveHorizontal="{Binding JoystickLeftHorizontalMovement, Mode=TwoWay}" MoveVertical="{Binding JoystickLeftVerticalMovement, Mode=TwoWay}" CameraStickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <ucns:Joystick x:Name="Joystick_R" HorizontalAlignment="Left" Height="240" Margin="500,286,0,0" VerticalAlignment="Top" Width="240" MoveHorizontal="{Binding JoystickRightHorizontalMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" MoveVertical="{Binding JoystickRightVerticalMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" CameraStickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <ucns:RoundSlider HorizontalAlignment="Left" Height="227" Margin="806,235,0,0" VerticalAlignment="Top" Width="57" Value="{Binding ZoomCameraSlider, Mode=TwoWay}" StickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <ucns:RoundSlider HorizontalAlignment="Left" Height="227" Margin="738,235,0,0" VerticalAlignment="Top" Width="57" Value="{Binding HeightChangeCameraSlider, Mode=TwoWay}" StickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <ucns:RangeSlider HorizontalAlignment="Left" Height="207" Margin="608,1,0,0" VerticalAlignment="Top" Width="27" RenderTransformOrigin="0.5,0.5" StickyControl="True" Value="{Binding SpeedMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ucns:RangeSlider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -44,14 +44,14 @@
                 </TransformGroup>
             </ucns:RangeSlider.RenderTransform>
         </ucns:RangeSlider>
-        <TextBox x:Name="TextBox_2" HorizontalAlignment="Left" Height="23" Margin="415,134,0,0" TextWrapping="Wrap" Text="{Binding MaxMovementSpeed, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MaxLines="1" MaxLength="3" IsUndoEnabled="True">
+        <TextBox x:Name="TextBox_2" HorizontalAlignment="Left" Height="23" Margin="739,93,0,0" TextWrapping="Wrap" Text="{Binding MaxMovementSpeed, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MaxLines="1" MaxLength="3" IsUndoEnabled="True">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="10"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <ucns:RangeSlider HorizontalAlignment="Left" Height="207" Margin="284,2,0,0" VerticalAlignment="Top" Width="27" RenderTransformOrigin="0.5,0.5" StickyControl="True" Value="{Binding SpeedVertical, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <ucns:RangeSlider HorizontalAlignment="Left" Height="207" Margin="608,-39,0,0" VerticalAlignment="Top" Width="27" RenderTransformOrigin="0.5,0.5" StickyControl="True" Value="{Binding SpeedVertical, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ucns:RangeSlider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -61,7 +61,7 @@
                 </TransformGroup>
             </ucns:RangeSlider.RenderTransform>
         </ucns:RangeSlider>
-        <TextBox x:Name="TextBox_1" HorizontalAlignment="Left" Height="23" Margin="415,94,0,0" TextWrapping="Wrap" Text="{Binding MaxVerticalSpeed, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MaxLines="1" MaxLength="3" IsUndoEnabled="True">
+        <TextBox x:Name="TextBox_1" HorizontalAlignment="Left" Height="23" Margin="739,53,0,0" TextWrapping="Wrap" Text="{Binding MaxVerticalSpeed, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MaxLines="1" MaxLength="3" IsUndoEnabled="True">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="10"/>
@@ -78,7 +78,7 @@
                 </TransformGroup>
             </ucns:RoundCheckBox.RenderTransform>
         </ucns:RoundCheckBox>
-        <ucns:RoundCheckBox x:Name="WindowTopmostControl" HorizontalAlignment="Left" Height="74" Margin="204,-12,0,0" VerticalAlignment="Top" Width="40" RenderTransformOrigin="0.5,0.5">
+        <ucns:RoundCheckBox x:Name="WindowTopmostControl" HorizontalAlignment="Left" Height="74" Margin="205,-12,0,0" VerticalAlignment="Top" Width="40" RenderTransformOrigin="0.5,0.5">
             <ucns:RoundCheckBox.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -88,7 +88,7 @@
                 </TransformGroup>
             </ucns:RoundCheckBox.RenderTransform>
         </ucns:RoundCheckBox>
-        <Grid Margin="217,239,573,195">
+        <Grid Margin="471,321,159,113">
             <RepeatButton Content="↑" HorizontalAlignment="Left" Height="20" Margin="21,1,0,0" VerticalAlignment="Top" Width="20" Interval="1" Delay="0" ucns:MouseCommandBehavior.MouseDownCommand="{Binding BtnMoveForward}" ucns:MouseCommandBehavior.MouseUpCommand="{Binding BtnStopMove}">
                 <RepeatButton.Resources>
                     <Style TargetType="{x:Type Border}">
@@ -119,7 +119,7 @@
             </RepeatButton>
         </Grid>
 
-        <Button Content="{Binding TextBlockDcsConnected, Mode=OneWay}" HorizontalAlignment="Left" Height="38" Margin="402,5,0,0" VerticalAlignment="Top" Width="71" Command="{Binding BtnConnectClick, Mode=OneWay}" Background="White">
+        <Button Content="{Binding TextBlockDcsConnected, Mode=OneWay}" HorizontalAlignment="Left" Height="38" Margin="622,5,0,0" VerticalAlignment="Top" Width="71" Command="{Binding BtnConnectClick, Mode=OneWay}" Background="White">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="19"/>
@@ -127,7 +127,7 @@
             </Button.Resources>
         </Button>
         <Label Content="{x:Static p:Resources.force_feedback}" HorizontalAlignment="Left" Margin="-15,52,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="198"/>
-        <ucns:RoundCheckBox HorizontalAlignment="Left" Height="74" Margin="463,31,0,0" VerticalAlignment="Top" Width="40" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding Experimental_MouseKeyboardControl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <ucns:RoundCheckBox HorizontalAlignment="Left" Height="74" Margin="205,117,0,0" VerticalAlignment="Top" Width="40" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding Experimental_MouseKeyboardControl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ucns:RoundCheckBox.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -137,18 +137,18 @@
                 </TransformGroup>
             </ucns:RoundCheckBox.RenderTransform>
         </ucns:RoundCheckBox>
-        <Label Content="{x:Static p:Resources.enable_mouse_keyboard}" HorizontalAlignment="Left" Margin="269,54,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="172"/>
+        <Label Content="{x:Static p:Resources.enable_mouse_keyboard}" HorizontalAlignment="Left" Margin="11,140,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="172"/>
         <Label Content="{x:Static p:Resources.window_topmost}" HorizontalAlignment="Left" Margin="-15,11,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="198"/>
-        <Label Content="MAX" HorizontalAlignment="Left" Margin="489,93,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61"/>
-        <Label Content="MAX" HorizontalAlignment="Left" Margin="489,133,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61"/>
-        <Button HorizontalAlignment="Left" Height="38" Margin="554,5,0,0" VerticalAlignment="Top" Width="71" Background="White" Content="{x:Static p:Resources.exit}" Click="Button_Click">
+        <Label Content="MAX" HorizontalAlignment="Left" Margin="813,52,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61"/>
+        <Label Content="MAX" HorizontalAlignment="Left" Margin="813,92,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61"/>
+        <Button HorizontalAlignment="Left" Height="38" Margin="774,5,0,0" VerticalAlignment="Top" Width="71" Background="White" Content="{x:Static p:Resources.exit}" Click="Button_Click">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="19"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <Label Content="{x:Static p:Resources.zoom}" HorizontalAlignment="Left" Margin="556,234,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5">
+        <Label Content="{x:Static p:Resources.zoom}" HorizontalAlignment="Left" Margin="806,191,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5">
             <Label.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -158,7 +158,7 @@
                 </TransformGroup>
             </Label.RenderTransform>
         </Label>
-        <Label Content="{x:Static p:Resources.altitude}" HorizontalAlignment="Left" Margin="485,235,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5">
+        <Label Content="{x:Static p:Resources.altitude}" HorizontalAlignment="Left" Margin="735,192,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5">
             <Label.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -168,16 +168,16 @@
                 </TransformGroup>
             </Label.RenderTransform>
         </Label>
-        <Label Content="{Binding TextBlockCameraHeading, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="175,212,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="88" FontSize="36"/>
-        <Label Content="{Binding TextBlockCameraPitch, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="254,212,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="110" FontSize="36"/>
-        <Label Content="{Binding TextBlockCameraRoll, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="363,212,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="101" FontSize="36"/>
-        <Label Content="{x:Static p:Resources.heading}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="175,202,0,0" VerticalAlignment="Top" Foreground="White" Width="87"/>
-        <Label Content="{x:Static p:Resources.pitch}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="276,202,0,0" VerticalAlignment="Top" Foreground="White" Width="87"/>
-        <Label Content="{x:Static p:Resources.roll}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="375,202,0,0" VerticalAlignment="Top" Foreground="White" Width="87"/>
-        <Label Content="{x:Static p:Resources.high}" HorizontalAlignment="Left" Margin="539,287,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5" FontSize="8"/>
-        <Label Content="{x:Static p:Resources.low}" HorizontalAlignment="Left" Margin="539,471,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5" FontSize="8"/>
-        <Label HorizontalAlignment="Left" Margin="93,223,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="100" Content="{x:Static p:Resources.camera_data}" FontSize="8"/>
-        <Button HorizontalAlignment="Left" Height="38" Margin="478,5,0,0" VerticalAlignment="Top" Width="71" Background="White" Content="{x:Static p:Resources.app_about}" IsEnabled="False">
+        <Label Content="{Binding TextBlockCameraHeading, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="365,182,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="88" FontSize="36"/>
+        <Label Content="{Binding TextBlockCameraPitch, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="444,182,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="110" FontSize="36"/>
+        <Label Content="{Binding TextBlockCameraRoll, Mode=OneWay}" HorizontalAlignment="Left" Margin="553,182,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="101" FontSize="36"/>
+        <Label Content="{x:Static p:Resources.heading}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="365,172,0,0" VerticalAlignment="Top" Foreground="White" Width="87"/>
+        <Label Content="{x:Static p:Resources.pitch}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="466,172,0,0" VerticalAlignment="Top" Foreground="White" Width="87"/>
+        <Label Content="{x:Static p:Resources.roll}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="565,172,0,0" VerticalAlignment="Top" Foreground="White" Width="87"/>
+        <Label Content="{x:Static p:Resources.high}" HorizontalAlignment="Left" Margin="789,244,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5" FontSize="8"/>
+        <Label Content="{x:Static p:Resources.low}" HorizontalAlignment="Left" Margin="789,428,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Left" Width="61" RenderTransformOrigin="0.5,0.5" FontSize="8"/>
+        <Label HorizontalAlignment="Left" Margin="283,193,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="100" Content="{x:Static p:Resources.camera_data}" FontSize="8"/>
+        <Button HorizontalAlignment="Left" Height="38" Margin="698,5,0,0" VerticalAlignment="Top" Width="71" Background="White" Content="{x:Static p:Resources.app_about}" IsEnabled="False">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="19"/>
@@ -185,12 +185,12 @@
             </Button.Resources>
         </Button>
 
-        <Grid Margin="518,43,0,0" ToolTip="{x:Static p:Resources.experiment_functions_tooltip_head}" HorizontalAlignment="Left" Width="50" Height="50" VerticalAlignment="Top">
+        <Grid Margin="260,129,0,0" ToolTip="{x:Static p:Resources.experiment_functions_tooltip_head}" HorizontalAlignment="Left" Width="50" Height="50" VerticalAlignment="Top">
             <TextBlock TextAlignment="Center" Height="10" Width="4" HorizontalAlignment="Center" VerticalAlignment="Center" Text="?" Panel.ZIndex="6" Foreground="White" FontSize="8" Margin="23,19,23,21"/>
             <Ellipse Fill="#FFAC0B0B" Panel.ZIndex="5" Margin="12"/>
 
         </Grid>
-        <ucns:RangeSlider HorizontalAlignment="Left" Height="207" Margin="284,81,0,0" VerticalAlignment="Top" Width="27" RenderTransformOrigin="0.5,0.5" StickyControl="True" Value="{Binding SpeedRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <ucns:RangeSlider HorizontalAlignment="Left" Height="207" Margin="608,40,0,0" VerticalAlignment="Top" Width="27" RenderTransformOrigin="0.5,0.5" StickyControl="True" Value="{Binding SpeedRotation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ucns:RangeSlider.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -200,21 +200,53 @@
                 </TransformGroup>
             </ucns:RangeSlider.RenderTransform>
         </ucns:RangeSlider>
-        <Label Content="{x:Static p:Resources.camera_rotation_speed}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="-15,172,0,0" VerticalAlignment="Top" Foreground="White" Width="197"/>
-        <Button HorizontalAlignment="Left" Height="23" Margin="415,173,0,0" VerticalAlignment="Top" Width="60" Background="White" Content="Edit" Click="EditBoxEnable">
+        <Label Content="{x:Static p:Resources.camera_rotation_speed}" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="309,131,0,0" VerticalAlignment="Top" Foreground="White" Width="197"/>
+        <Button HorizontalAlignment="Left" Height="23" Margin="739,132,0,0" VerticalAlignment="Top" Width="60" Background="White" Content="Edit" Click="EditBoxEnable">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="10"/>
                 </Style>
             </Button.Resources>
         </Button>
-        <TextBox HorizontalAlignment="Left" Height="38" Margin="326,5,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="{Binding TcpDataPort, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="71" FontSize="16" IsEnabled="{Binding CanChangeConnectionData, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+        <TextBox HorizontalAlignment="Left" Height="38" Margin="546,5,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="{Binding TcpDataPort, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="71" FontSize="16" IsEnabled="{Binding CanChangeConnectionData, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
             <TextBox.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="19"/>
                 </Style>
             </TextBox.Resources>
         </TextBox>
-        <Label Content="{x:Static p:Resources.data_port}" HorizontalAlignment="Left" Margin="270,11,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="52"/>
+        <Label Content="{x:Static p:Resources.data_port}" HorizontalAlignment="Left" Margin="490,11,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="52"/>
+        <ucns:RoundCheckBox HorizontalAlignment="Left" Height="74" Margin="205,74,0,0" VerticalAlignment="Top" Width="40" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding CameraOrientationFollowing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ucns:RoundCheckBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="90"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ucns:RoundCheckBox.RenderTransform>
+        </ucns:RoundCheckBox>
+        <Label Content="{x:Static p:Resources.follow_cam_orientation}" HorizontalAlignment="Left" Margin="-15,97,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="198"/>
+        <ucns:RoundSlider HorizontalAlignment="Left" Height="227" Margin="588,151,0,0" VerticalAlignment="Top" Width="57" Value="{Binding CameraRoll, Mode=TwoWay}" StickyControl="{Binding CameraForceFeedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.5,0.5">
+            <ucns:RoundSlider.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="90"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ucns:RoundSlider.RenderTransform>
+        </ucns:RoundSlider>
+        <ucns:RoundCheckBox HorizontalAlignment="Left" Height="74" Margin="205,160,0,0" VerticalAlignment="Top" Width="40" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding EnableCockpitCameraControl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <ucns:RoundCheckBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="90"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ucns:RoundCheckBox.RenderTransform>
+        </ucns:RoundCheckBox>
+        <Label Content="Cockpit Camera Control" HorizontalAlignment="Left" Margin="11,183,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="172"/>
     </Grid>
 </Window>

@@ -30,6 +30,7 @@ namespace DCS_AECIS.Model
         public double RightJoystickHorizontalMovement { get; set; } = 0;
 
         //public bool InvertPitchControl { get; set; } = false;
+        public double RollSliderMovement { get; set; } = 0;
 
         // controlling params
         public double ZoomRate { get; set; } = 0;
@@ -47,6 +48,8 @@ namespace DCS_AECIS.Model
 
         public bool IsMovementOrientationCorrelated { get; set; } = false;
         public bool IsForceFeedback { get; set; } = false;
+
+        public bool UseCockpitCameraControl { get; set; } = false;
 
         /// <summary>
         /// Constructor for CameraController class
@@ -97,6 +100,12 @@ namespace DCS_AECIS.Model
 
                 setCamera.DirectionalMovement = LeftJoystickVerticalMovement * MaxMovementSpeed * MovementSpeed;
                 setCamera.HorizontalMovement = LeftJoystickHorizontalMovement * MaxMovementSpeed * MovementSpeed;
+
+                setCamera.JoystickRawInput = new List<double> { LeftJoystickVerticalMovement, LeftJoystickHorizontalMovement};
+
+                setCamera.OrientationFollowing = IsMovementOrientationCorrelated;
+
+                setCamera.UseCockpitCameraControl = UseCockpitCameraControl;
             }
             else  // both are zero, no movement
             {
@@ -105,19 +114,24 @@ namespace DCS_AECIS.Model
 
                 setCamera.DirectionalMovement = 0;
                 setCamera.HorizontalMovement = 0;
+
+                setCamera.JoystickRawInput = new List<double> { 0, 0 };
+
+                setCamera.OrientationFollowing = IsMovementOrientationCorrelated;
             }
             // else joystick no movement, do nothing
         }
 
         public void RotateCamera()
         {
-            if (RightJoystickHorizontalMovement != 0 || RightJoystickVerticalMovement != 0)
+            if (RightJoystickHorizontalMovement != 0 || RightJoystickVerticalMovement != 0 || RollSliderMovement != 0)
             {
                 setCamera.CameraCommand = 1;
                 setCamera.CameraParams = new List<double>
                 {
                     RightJoystickHorizontalMovement * RotationSpeed,
-                    -RightJoystickVerticalMovement * RotationSpeed
+                    -RightJoystickVerticalMovement * RotationSpeed,
+                    RollSliderMovement * RotationSpeed
                 };
             }
             else  // both are zero, no movement
@@ -125,7 +139,7 @@ namespace DCS_AECIS.Model
                 setCamera.CameraCommand = 1;
                 setCamera.CameraParams = new List<double>
                 {
-                    0, 0
+                    0, 0, 0
                 };
             }
             // else joystick no movement, do nothing
@@ -134,6 +148,8 @@ namespace DCS_AECIS.Model
         public void ZoomCamera()
         {
             setCamera.CameraZoomLevel = ZoomRate;
+
+            setCamera.ZoomSliderRawInput = ZoomRate;
         }
 
         public void HeightChangeCamera()

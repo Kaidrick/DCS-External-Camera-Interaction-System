@@ -162,6 +162,9 @@
 鼠标键盘Hook，如果由于异常退出，
 Hook可能不能被正常解除并消除）。</value>
   </data>
+  <data name="follow_cam_orientation" xml:space="preserve">
+    <value>严格垂直移动</value>
+  </data>
   <data name="force_feedback" xml:space="preserve">
     <value>力反馈</value>
   </data>

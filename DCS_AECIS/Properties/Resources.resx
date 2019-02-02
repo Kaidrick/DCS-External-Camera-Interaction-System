@@ -164,6 +164,9 @@ Mouse/Keyboard input performance
 which may not be properly unload and 
 disposed if an unhandled exception occured).</value>
   </data>
+  <data name="follow_cam_orientation" xml:space="preserve">
+    <value>Strict Vertical Movement</value>
+  </data>
   <data name="force_feedback" xml:space="preserve">
     <value>Force Feedback</value>
   </data>

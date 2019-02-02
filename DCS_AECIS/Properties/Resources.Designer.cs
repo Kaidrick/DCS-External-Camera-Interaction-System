@@ -180,6 +180,15 @@ namespace DCS_AECIS.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Strict Vertical Movement.
+        /// </summary>
+        public static string follow_cam_orientation {
+            get {
+                return ResourceManager.GetString("follow_cam_orientation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Force Feedback.
         /// </summary>
         public static string force_feedback {
