@@ -118,6 +118,7 @@ namespace DCS_AECIS.Model
                 setCamera.JoystickRawInput = new List<double> { 0, 0 };
 
                 setCamera.OrientationFollowing = IsMovementOrientationCorrelated;
+                setCamera.UseCockpitCameraControl = UseCockpitCameraControl;
             }
             // else joystick no movement, do nothing
         }
@@ -126,6 +127,8 @@ namespace DCS_AECIS.Model
         {
             if (RightJoystickHorizontalMovement != 0 || RightJoystickVerticalMovement != 0 || RollSliderMovement != 0)
             {
+                setCamera.UseCockpitCameraControl = UseCockpitCameraControl;
+
                 setCamera.CameraCommand = 1;
                 setCamera.CameraParams = new List<double>
                 {
@@ -136,6 +139,8 @@ namespace DCS_AECIS.Model
             }
             else  // both are zero, no movement
             {
+                setCamera.UseCockpitCameraControl = UseCockpitCameraControl;
+
                 setCamera.CameraCommand = 1;
                 setCamera.CameraParams = new List<double>
                 {
@@ -150,10 +155,14 @@ namespace DCS_AECIS.Model
             setCamera.CameraZoomLevel = ZoomRate;
 
             setCamera.ZoomSliderRawInput = ZoomRate;
+
+            setCamera.UseCockpitCameraControl = UseCockpitCameraControl;
         }
 
         public void HeightChangeCamera()
         {
+            setCamera.UseCockpitCameraControl = UseCockpitCameraControl;
+
             // add height change to current setCamera
             setCamera.P.Y = MaxVerticalSpeed * HeightChangeRate * VerticalSpeed;
 
