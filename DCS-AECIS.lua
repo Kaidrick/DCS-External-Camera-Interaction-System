@@ -333,7 +333,7 @@ end
 
 function AECIS.step()
 	if AECIS.server then
-		AECIS.server:settimeout(0.001)  -- give up if no connection from a client
+		AECIS.server:settimeout(0)  -- give up if no connection from a client
 		AECIS.client = AECIS.server:accept()  -- if client is nil then connection is not made
 		
 		if AECIS.client then  -- if client is not nil, connection is made
@@ -373,7 +373,7 @@ end
 
 function LuaExportStart()
 	AECIS.server = assert(AECIS.socket.bind("127.0.0.1", AECIS.PORT))
-	AECIS.server:settimeout(0.001)  -- give up if not connection from a client is made
+	AECIS.server:settimeout(0)  -- give up if not connection from a client is made
 	local ip, port = AECIS.server:getsockname()
 	AECIS.log("AECIS: Server Started on Port " .. port .. " at " .. ip)
 	
