@@ -9,6 +9,9 @@ package.cpath = package.cpath .. ";./LuaSocket/?.dll"
 AECIS.socket = require("socket")
 AECIS.JSON = require("JSON")
 require("Vector")
+require("Matrix33")
+
+local inspect = require("inspect")
 
 AECIS.client = nil
 AECIS.server = nil
@@ -22,8 +25,23 @@ _prevExport.LuaExportStart = LuaExportStart
 _prevExport.LuaExportStop = LuaExportStop
 
 
-local inertia_delta = nil
-local inertia_angle_delta = nil
+
+local still_camera = {
+	command = 1,
+	dX = 0,  -- forward or backward  --> -1 <= value <= 1
+	dY = 0,  -- up or down
+	dZ = 0,  -- left or right
+	joy_raw = { 0, 0 },
+	o_f = false,
+	
+	params = { 0, 0, 0 },
+	pit_cam = false,
+	
+	zoom = 0,
+	zoom_raw = 0
+}
+local inertia_delta = still_camera
+local inertia_angle_delta = still_camera.params
 
 -- stop zoom before set new command based on zoom_level?
 AECIS.model_iteration_count = 0  -- interval is 0.01 second
@@ -46,107 +64,128 @@ function AECIS.log(str)
 	end
 end
 
-function setNewCamera(camera_delta)  -- new camera is a table, instruction should be discrete
-	--[[
-	camera_delta contains the camera movement delta
+
+local function isSameCameraDelta(d1, d2)
+	if not d1 and not d2 then return true end
+	if not d1 and d2 then return false end
+	if d1 and not d2 then return false end
+
+	local eX = (d1.dX == d2.dX)
+	local eY = (d1.dY == d2.dY)
+	local eZ = (d1.dZ == d2.dZ)
+	local eCmd = (d1.command == d2.command)
+	local eZoom = (d1.zoom == d2.zoom)
 	
-	camera_delta = {
-		dX  -- forward or backward  --> -1 <= value <= 1
-		dY  -- up or down
-		dZ  -- left or right
+	local eParams
+	
+	if d1.params and d2.params then
+		local eP1 = (d1.params[1] == d2.params[1])
+		local eP2 = (d1.params[2] == d2.params[2])
+		local eP3 = (d1.params[3] == d2.params[3])
 		
-		action  -- like, switching views
-	}
-	
-	
-	camera_delta = {
-		p = {
-			x = dx,
-			y = dy,
-			z = dz
-		},
-		x = {},
-		y = {},
-		z = {},  -- maybe useless, can't make xyz work, use set command to rotate camera instead
+		eParams = eP1 and eP2 and eP3
 		
-		camera_command,  -- int
-		camera_params,  -- list of doubles
-	}
+	else  -- params not both nil, must not equal
+		return false
+	end
 	
+	return eX and eY and eZ and eCmd and eZoom and eParams
+end
+
+
+
+
+--[[
+	Input camera_delta example:
+	LuaExport::LuaExportStart: 
+	{
+		command = 1,
+		dX = 0,  -- forward or backward  --> -1 <= value <= 1
+		dY = 0,  -- up or down
+		dZ = 0,  -- left or right
+		joy_raw = { 0, 0 },
+		o_f = false,
+		
+		params = { 0.026111111111111, -0.0038888888888889, 0 },
+		pit_cam = false,
+		
+		zoom = 0,
+		zoom_raw = 0
+	}
 	if there is no movement, then all value should be either NaN or zero
 	if there is movement, then keep add delta to the current camera for each frame
 	
-	--]]
-	-- rate control
-	
-	-- get current camera position
-	
-	
-	-- check if data is valid, especially position --> p
-	if not camera_delta or camera_delta.p.x == 'NaN' or camera_delta.p.y == 'NaN' or camera_delta.p.z == 'NaN' then
-		-- no input or invalid input from client, keep moving using last valid instruction
-		if inertia_delta then
-			--AECIS.log("camera_delta is nil or input is invalid, use inertia_delta")
-			camera_delta = inertia_delta  -- retrieve last valid delta
-		else  -- inertia_delta is also nil, meaning no data available, no need to set new camera
-			--AECIS.log("inertia_delta does not exist. keep camera still")
-			return
+--]]
+function setNewCamera(camera_delta)  -- new camera is a table, instruction should be discrete
+	if camera_delta then
+		-- if params are missing, use default value of 0,0,0
+		if not camera_delta.params then
+			camera_delta.params = inertia_angle_delta or still_camera.params
 		end
+	else
+		camera_delta = inertia_delta or still_camera  -- if last camera is nil (first data?) then take still camera
+	end
+	
+	if isSameCameraDelta(camera_delta, still_camera) and isSameCameraDelta(inertia_delta, still_camera) then
+		return
 	end
 	
 	
-	
-	
-	dX = camera_delta.dX
-	dY = camera_delta.dY
-	dZ = camera_delta.dZ
+	local dX = camera_delta.dX
+	local dY = camera_delta.dY
+	local dZ = camera_delta.dZ
 	
 	local follow_orientation = camera_delta.o_f  -- true or false
 	
-	
 	local cp = LoGetCameraPosition()
 	
-	local X
-	local Y
-	local Z
-	local P
+	-- if to follow orientation, then find current facing direction, and find x y z components and added to P
+	-- if not to follow orientation, add value directly to 
 	
+	local X = Vector(cp.x.x, cp.x.y, cp.x.z)
+	local Y = Vector(cp.y.x, cp.y.y, cp.y.z)
+	local Z = Vector(cp.z.x, cp.z.y, cp.z.z)
+	local P = Vector(cp.p.x, cp.p.y, cp.p.z)  -- Camera Position in LO coordinates
+
+	
+	-- TODO: refactoring if block
+	local mX, mY, mZ
 	if follow_orientation then
-		X = Vector(cp.x.x, cp.x.y, cp.x.z)
-		Y = Vector(cp.y.x, cp.y.y, cp.y.z)
-		Z = Vector(cp.z.x, cp.z.y, cp.z.z)
-		P = Vector(cp.p.x, cp.p.y, cp.p.z)  -- Camera Position in LO coordinates
-		
-		-- TODO: independent y-axis movement?
-		
+		mX = X * dX
+		mY = Y * dY
+		mZ = Z * dZ
 	else  -- only move in x-z plane
-		X = Vector(cp.x.x, 0, cp.x.z)
-		Y = Vector(0, 1, 0)  -- y-axis
-		Z = Vector(cp.z.x, 0, cp.z.z)
-		P = Vector(cp.p.x, cp.p.y, cp.p.z)  -- Camera Position in LO coordinates
+		local bX = Vector(X.x, 0, X.z)
+		local bY = Vector(0, 1, 0)
+		local bZ = Vector(Z.x, 0, Z.z)
+	
+		mX = bX * dX
+		mY = bY * dY
+		mZ = bZ * dZ
 	end
-	
-	
-	
-	mX = X * dX
-	mY = Y * dY
-	mZ = Z * dZ
 	
 	P = P + mX
 	P = P + mY
 	P = P + mZ
 	
-	local new_camera_pos = {
-		x = cp.x,
-		y = cp.y,
-		z = cp.z,
-		p = {
-			x = P.x,
-			y = P.y,
-			z = P.z
-		}
-	}
+	-- TODO: camera is stuck when pointing along Y axis
+	-- TODO: need to observe how the native functions (equivalent to using numpad to rotate) works
 	
+	local rotM = Matrix33()
+	rotM.x = X
+	rotM.y = Y
+	rotM.z = Z
+	
+	rotM:RotateY(-camera_delta.params[1])
+	rotM:RotateX(-camera_delta.params[2])
+	
+	local new_camera_pos = {
+		x = rotM.x,
+		y = rotM.y,
+		z = rotM.z,
+		p = P
+	}
+
 	-- otherwise if code reaches here, either camera_delta is refreshed or camera_delta is inertia_delta
 	local p = camera_delta.p
 	local x = camera_delta.x
@@ -177,8 +216,6 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 			-- command = 2007 - mouse camera rotate left/right  
 			-- command = 2008 - mouse camera rotate up/down
 			-- command = 2009 - mouse camera zoom 
-			
-			-- test commands
 			
 			-- > 2012 iCommandViewZoomAbs -- cockpit zoom, negative decrease FOV, positive increase FOV
 			-- get zoom slider raw input
@@ -333,11 +370,11 @@ end
 
 function AECIS.step()
 	if AECIS.server then
-		AECIS.server:settimeout(0)  -- give up if no connection from a client
+		-- AECIS.server:settimeout(0)  -- give up if no connection from a client
 		AECIS.client = AECIS.server:accept()  -- if client is nil then connection is not made
 		
 		if AECIS.client then  -- if client is not nil, connection is made
-			AECIS.client:settimeout(0.001)
+			-- AECIS.client:settimeout(0.001)
 			-- send camera data first
 			local current_camera_position = LoGetCameraPosition()
 			
@@ -430,9 +467,9 @@ local _helios = false  -- HELIOS send every 0.1 second
 local limit_step = 0
 
 
-function LuaExportAfterNextFrame()
-	export_units = LoGetWorldObjects()
-end
+-- function LuaExportAfterNextFrame()
+--  	export_units = LoGetWorldObjects()
+-- end
 
 
 function LuaExportActivityNextEvent(t)
@@ -447,7 +484,7 @@ function LuaExportActivityNextEvent(t)
 	
 	-- call original function once every 20 iterations
 	limit_step = limit_step + 1 -- iter
-	if limit_step == 20 then
+	if limit_step == 200 then
 		local _status,_result = pcall(function()
 			-- Call original function if it exists
 			if _prevExport.LuaExportActivityNextEvent then
@@ -460,7 +497,7 @@ function LuaExportActivityNextEvent(t)
 		end
 		
 		-- reset limit_step to 0
-		limit_step = 20
+		limit_step = 0
 	end
     
 		
