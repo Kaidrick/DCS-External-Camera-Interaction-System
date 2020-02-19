@@ -164,9 +164,9 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 		mZ = bZ * dZ
 	end
 	
-	P = P + mX
-	P = P + mY
-	P = P + mZ
+	P = P + mX * 0.1
+	P = P + mY * 0.1
+	P = P + mZ * 0.1
 	
 	-- TODO: camera is stuck when pointing along Y axis
 	-- TODO: need to observe how the native functions (equivalent to using numpad to rotate) works
@@ -176,8 +176,8 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 	rotM.y = Y
 	rotM.z = Z
 	
-	rotM:RotateY(-camera_delta.params[1])
-	rotM:RotateX(-camera_delta.params[2])
+	rotM:RotateY(-camera_delta.params[1] * 0.01)
+	rotM:RotateZ(-camera_delta.params[2] * 0.01)
 	
 	local new_camera_pos = {
 		x = rotM.x,
@@ -242,9 +242,18 @@ function setNewCamera(camera_delta)  -- new camera is a table, instruction shoul
 				LoSetCommand(2048, dZ * 0.001)
 				LoSetCommand(2050, dY * 0.001 * -1)
 				LoSetCommand(2052, dX * 0.001)
+				
+				LoSetCommand(2007, params[1] * 0.001) -- 
+				LoSetCommand(2008, params[2] * 0.001) -- 
+				
+				-- set roll?
+				LoSetCommand(2046, params[3])
 			end
 			
-			---[[
+			-- set zoom anyway
+			AECIS.cameraZoom(zoom)
+			
+			--[[
 			-- camera rotation control
 			-- camera rotation very sluggish on high movement speed, need to investigate
 			-- very sluggish even if vector logic is put in lua
