@@ -51,6 +51,9 @@ namespace DCS_AECIS.Model
 
         public bool UseCockpitCameraControl { get; set; } = false;
 
+        public bool DisableHorizontalRotation { get; set; } = false;
+        public bool DisableHorizontalMovement { get; set; } = false;
+
         /// <summary>
         /// Constructor for CameraController class
         /// </summary>
@@ -83,6 +86,8 @@ namespace DCS_AECIS.Model
                 // TODO: following camera facing direction or not option
                 // TODO: movement changes height if pitch is not zero option
 
+                // if DisableHorizontalMovment is true, do not move camera left and right
+                LeftJoystickHorizontalMovement = DisableHorizontalMovement ? 0 : LeftJoystickHorizontalMovement;
 
                 // calculate angle between joystick movment and joystick forward direction
                 MathNet.Spatial.Units.Angle moveAngle =
@@ -130,6 +135,10 @@ namespace DCS_AECIS.Model
                 setCamera.UseCockpitCameraControl = UseCockpitCameraControl;
 
                 setCamera.CameraCommand = 1;
+
+                // if DisableHorizontalRotation is true, do not rotate camera left and right
+                RightJoystickHorizontalMovement = DisableHorizontalRotation ? 0 : RightJoystickHorizontalMovement;
+
                 setCamera.CameraParams = new List<double>
                 {
                     RightJoystickHorizontalMovement * RotationSpeed,

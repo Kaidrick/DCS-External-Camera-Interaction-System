@@ -24,8 +24,16 @@ namespace DCS_AECIS.ViewModel
         //private CameraControllerViewModel _cameraControllerViewModel;
         private Camera camera;
 
-        #region Mouse and Keyboard Hook
-        private IKeyboardMouseEvents m_GlobalHook;  // mouse hook
+
+        // singleton connection
+        private TcpClient tcpClient;
+        private NetworkStream networkStream;
+        private StreamReader streamReader;
+        private StreamWriter streamWriter;
+
+
+#region Mouse and Keyboard Hook
+private IKeyboardMouseEvents m_GlobalHook;  // mouse hook
         private bool mouseMiddileButtonPressed;
         private double mouseLastX = 0;
         private double mouseLastY = 0;
@@ -198,6 +206,11 @@ namespace DCS_AECIS.ViewModel
                 //System.Windows.MessageBox.Show("Failed to Unsubscribe MouseKeyboardEvent Hook. Maybe it's already unhooked?");
             }
 
+        }
+
+        private void DisplayerMouseKeyboardHookDisposalOnException(object sender, EventArgs eventArgs)
+        {
+            m_GlobalHook.Dispose();
         }
 
 
@@ -440,6 +453,32 @@ namespace DCS_AECIS.ViewModel
             }
         }
 
+        public bool DisableHorizontalRotation
+        {
+            get
+            {
+                return _cameraController.DisableHorizontalRotation;
+            }
+            set
+            {
+                _cameraController.DisableHorizontalRotation = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DisableHorizontalRotation"));
+            }
+        }
+
+        public bool DisableHorizontalMovement
+        {
+            get
+            {
+                return _cameraController.DisableHorizontalMovement;
+            }
+            set
+            {
+                _cameraController.DisableHorizontalMovement = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DisableHorizontalMovement"));
+            }
+        }
+
         #endregion Databinding Properties
 
         // ICommand
@@ -569,6 +608,8 @@ namespace DCS_AECIS.ViewModel
             };
 
             _timer.Tick += _timer_Tick;
+
+            AppDomain.CurrentDomain.UnhandledException += DisplayerMouseKeyboardHookDisposalOnException;
         }
 
         private void CameraDataDisplayerViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -610,8 +651,6 @@ namespace DCS_AECIS.ViewModel
             }
         }
 
-
-
         //private void VirtualJoystickViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         //{
         //    MessageBox.Show("vm property changed!");
@@ -624,31 +663,39 @@ namespace DCS_AECIS.ViewModel
         /// <param name="e"></param>
         private void _timer_Tick(object sender, EventArgs e)
         {
+            // check if connection can be established by try to create a socket with given port number
             bool connectedCheck;
             string jsonCameraData;
-            StreamWriter writer;
+
             try
             {
-                TcpClient client = new TcpClient(_dataDisplayer.IPAddress, _dataDisplayer.Port);
-                NetworkStream nws = client.GetStream();
-                nws.WriteTimeout = 100;
-                nws.ReadTimeout = 100;
+                // SETCAMERA IS A DELTA VALUE, NOT CAMERA DATA VALUE
 
-                StreamReader reader = new StreamReader(nws);
-                writer = new StreamWriter(nws) { AutoFlush = true };
+                var jsonSetCameraData = JsonConvert.SerializeObject(_cameraController.setCamera);
+                ////MessageBox.Show(jsonSetCameraData);
+                streamWriter.WriteLine(jsonSetCameraData);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockSetCameraData"));
 
-                jsonCameraData = reader.ReadLine();
+                // currently this create a new tcp connection every time a set of data needs to be sent to lua server
+                // 
+
+                jsonCameraData = streamReader.ReadLine();
 
                 connectedCheck = true;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                writer = null;
+                System.Windows.MessageBox.Show(exception.Message);
+
+                streamWriter = null;
                 jsonCameraData = null;
                 connectedCheck = false;
                 _dataDisplayer.DisplayerConnected = false;
                 //System.Windows.MessageBox.Show(exception.ToString());
                 // abort connection here?
+
+                tcpClient.Close();
+
                 _timer.Stop();
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockDcsConnected"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CanChangeConnectionData")); 
@@ -657,8 +704,11 @@ namespace DCS_AECIS.ViewModel
             if (connectedCheck)
             {
                 //MessageBox.Show(jsonCameraData);
-                _cameraController.ParseCameraData(jsonCameraData);  // parsing data
-
+                if(jsonCameraData != null)
+                {
+                    _cameraController.ParseCameraData(jsonCameraData);  // parsing data
+                }
+                
                 _cameraController.UpdateCameraData();
 
                 //_cameraController.PrepareSetCamera(_dataDisplayer.camera);  -- WRONG
@@ -674,12 +724,7 @@ namespace DCS_AECIS.ViewModel
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockCameraPitch"));
 
 
-                // SETCAMERA IS A DELTA VALUE, NOT CAMERA DATA VALUE
-
-                var jsonSetCameraData = JsonConvert.SerializeObject(_cameraController.setCamera);
-                ////MessageBox.Show(jsonSetCameraData);
-                writer.Write(jsonSetCameraData + "\n");
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextBlockSetCameraData"));
+                
 
                 _dataDisplayer.DisplayerConnected = true;
             }
@@ -687,17 +732,42 @@ namespace DCS_AECIS.ViewModel
         }
 
 
-
+        /// <summary>
+        /// This method is the behavior on connect button click
+        /// </summary>
         public void DataDisplayerConnectionControl()  // control connect and disconnect
         {
             if (!_dataDisplayer.DisplayerConnected)
             {
                 // not connected, can connect
-                _timer.Start();
+
+                // first check if connection can be established
+                try
+                {
+                    tcpClient = new TcpClient(_dataDisplayer.IPAddress, _dataDisplayer.Port);
+                    networkStream = tcpClient.GetStream();
+                    networkStream.WriteTimeout = 100;
+                    networkStream.ReadTimeout = 100;
+
+                    streamReader = new StreamReader(networkStream);
+                    streamWriter = new StreamWriter(networkStream) { AutoFlush = true };
+
+                    streamWriter.WriteLine();
+                    string str = streamReader.ReadLine();
+
+                    //System.Windows.MessageBox.Show(str);
+
+                    _timer.Start();
+                } 
+                catch (Exception exception)
+                {
+                    System.Windows.MessageBox.Show(exception.Message);
+                }
             }
             else
             {
                 // connected, should disconnect
+                tcpClient.Close();
                 _timer.Stop();
                 _dataDisplayer.DisplayerConnected = false;
             }

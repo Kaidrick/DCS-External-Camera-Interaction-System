@@ -9,7 +9,7 @@
         xmlns:p="clr-namespace:DCS_AECIS.Properties"
         mc:Ignorable="d"
         
-        Title="AECIS" Height="514.874" Width="876.284" Foreground="{x:Null}" WindowStyle="None" Topmost="{Binding IsChecked, ElementName=WindowTopmostControl}" AllowsTransparency="True">
+        Title="AECIS" Height="605.874" Width="876.284" Foreground="{x:Null}" WindowStyle="None" Topmost="{Binding IsChecked, ElementName=WindowTopmostControl}" AllowsTransparency="True">
     <Window.Background>
         <SolidColorBrush Opacity="0.4" Color="#FF4D4D4D"/>
     </Window.Background>
@@ -248,5 +248,30 @@
             </ucns:RoundCheckBox.RenderTransform>
         </ucns:RoundCheckBox>
         <Label Content="Cockpit Camera Control" HorizontalAlignment="Left" Margin="11,183,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="172"/>
+        <ucns:RoundCheckBox HorizontalAlignment="Left" Height="72" Margin="693,498,0,0" VerticalAlignment="Top" Width="38" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding DisableHorizontalRotation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <ucns:RoundCheckBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="90"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ucns:RoundCheckBox.RenderTransform>
+        </ucns:RoundCheckBox>
+        <Label Content="Disable Horizontal Rotation" HorizontalAlignment="Left" Margin="500,519,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="172"/>
+        <ucns:RoundCheckBox HorizontalAlignment="Left" Height="72" Margin="444,498,0,0" VerticalAlignment="Top" Width="38" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding DisableHorizontalMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ucns:RoundCheckBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="90"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </ucns:RoundCheckBox.RenderTransform>
+        </ucns:RoundCheckBox>
+        <Label Content="Disable Latera Movement" HorizontalAlignment="Left" Margin="248,519,0,0" VerticalAlignment="Top" Foreground="White" HorizontalContentAlignment="Right" Width="172"/>
+        <Label Content="Ctrl + Left Mouse Button to drag window" HorizontalAlignment="Left" Margin="10,241,0,0" VerticalAlignment="Top" Foreground="White" Width="232"/>
+        <Label Content="W, A, S and D to control camera movement" HorizontalAlignment="Left" Margin="10,268,0,0" VerticalAlignment="Top" Foreground="White" Width="243"/>
+        <Label Content="Hold Middle Mouse Button to rotate camera" HorizontalAlignment="Left" Margin="10,295,0,0" VerticalAlignment="Top" Foreground="White" Width="250"/>
     </Grid>
 </Window>

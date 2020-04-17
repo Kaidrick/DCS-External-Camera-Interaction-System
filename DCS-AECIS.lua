@@ -8,10 +8,12 @@ package.cpath = package.cpath .. ";./LuaSocket/?.dll"
 
 AECIS.socket = require("socket")
 AECIS.JSON = require("JSON")
+
 require("Vector")
 require("Matrix33")
 
-local inspect = require("inspect")
+
+local limit_step = 0
 
 AECIS.client = nil
 AECIS.server = nil
@@ -23,7 +25,6 @@ _prevExport.LuaExportActivityNextEvent = LuaExportActivityNextEvent
 _prevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
 _prevExport.LuaExportStart = LuaExportStart
 _prevExport.LuaExportStop = LuaExportStop
-
 
 
 local still_camera = {
@@ -58,7 +59,7 @@ local export_units = {}
 
 AECIS.logFile = io.open(lfs.writedir()..[[Logs\DCS-AECIS.log]], "w")
 function AECIS.log(str)
-	if AECIS.logFile then
+	if AECIS.logFile and str then
 		AECIS.logFile:write(str .. "\n")
 		AECIS.logFile:flush()
 	end
@@ -376,50 +377,93 @@ function AECIS.cameraZoom(zoom_level)  -- what is value change direction? very s
 	end
 end
 
+local last_comm_timestamp
 
 function AECIS.step()
-	if AECIS.server then
-		-- AECIS.server:settimeout(0)  -- give up if no connection from a client
-		AECIS.client = AECIS.server:accept()  -- if client is nil then connection is not made
+  if AECIS.server then
+    if not AECIS.client then  -- if no client, establish connection from server object
+      AECIS.client = AECIS.server:accept()  -- accept connection from client
+      
+      if AECIS.client then  -- if a client has been accepted
+        AECIS.client:settimeout(0)  -- set non-blocking client timeout
+        
+        local line, err = AECIS.client:receive()  -- receive a line from client
+        
+        if not err then  -- if no error occurs during the receive
+          last_comm_timestamp = os.time()  -- update on successful handshake
+          
+          AECIS.client:send(AECIS.JSON:encode(LoGetCameraPosition()) .. "\r\n")  -- send current camera position to client
+          
+		  setNewCamera(AECIS.JSON:decode(line))  -- parse camera delta json from client and perform camera action
+        else
+          AECIS.log(err)
+		  
+		  setNewCamera(nil)  -- maintain inertia
+        end
+	  else  -- no client exist; might happen at mission start, or after a client disconnect; maintain inertia if any
+		  setNewCamera(nil)  -- maintain inertia
+      end
+      
+    else  -- existing client, reuse this object
+      -- reuse client
+      local line, err = AECIS.client:receive()
+      
+      if err then  -- client exist, but client does not send any message
+        if err == 'timeout' then
 		
-		if AECIS.client then  -- if client is not nil, connection is made
-			-- AECIS.client:settimeout(0.001)
-			-- send camera data first
-			local current_camera_position = LoGetCameraPosition()
+	      setNewCamera(nil)  -- maintain inertia
+          
+          if not last_comm_timestamp then  -- client exists, but handshake failed
+            
+          end
+        
+          if os.time() - last_comm_timestamp > 5 then
+            AECIS.log("connection is asserted to be lost")
+            
+            AECIS.client:close()
+            AECIS.client = nil
 			
-			local cam_pos = AECIS.JSON:encode(current_camera_position)  -- encode a table to JSON string
-			AECIS.client:send(cam_pos .. "\n")
-			
-			-- then receive camera delta
-			local line, err = AECIS.client:receive()
-			if not err then
-				-- try parsing json string, JSON:decode(delta_json)
-				local success, res = pcall(
-					function()
-						return AECIS.JSON:decode(line)
-					end
-				)
-				if success then  -- run request
-					setNewCamera(res)
-					--SetCamera(res)
-				else
-					AECIS.log(res)  -- print JSON decode error to log
-				end
-			end
-			AECIS.client:close()
-		else  -- no connection from client
-			-- keep moving camera
-			setNewCamera(nil)
-			--SetCamera(nil)
-			--log("No connection. Keep Inertia")
-		end
-	end
+            return
+          end
+          
+        elseif err == 'closed' then
+          AECIS.log("connection is closed")
+          AECIS.client:close()
+          AECIS.client = nil
+		  
+		  setNewCamera(nil)  -- maintain inertia
+          return
+          
+        else  -- other errors
+          AECIS.log(err)
+		  
+		  setNewCamera(nil)  -- maintain inertia
+        end
+      end
+
+      if not err then  -- successful handshake
+        last_comm_timestamp = os.time()
+        
+        AECIS.client:send(AECIS.JSON:encode(LoGetCameraPosition()) .. "\r\n")
+        
+		setNewCamera(AECIS.JSON:decode(line))
+        
+      end
+    end
+  end
 end
 
 
 function LuaExportStart()
-	AECIS.server = assert(AECIS.socket.bind("127.0.0.1", AECIS.PORT))
-	AECIS.server:settimeout(0)  -- give up if not connection from a client is made
+	AECIS.log("Starting AECIS Export Server")
+	
+	AECIS.server = AECIS.socket.tcp()
+  
+    assert(AECIS.server:bind("localhost", AECIS.PORT))
+    assert(AECIS.server:listen())
+  
+    AECIS.server:settimeout(0)  -- non-blocking
+  
 	local ip, port = AECIS.server:getsockname()
 	AECIS.log("AECIS: Server Started on Port " .. port .. " at " .. ip)
 	
@@ -469,16 +513,6 @@ function LuaExportBeforeNextFrame()
 end
 
 
--- base timer is 0.01 second, step iterates 20 times is 0.2 second, 10 times is 0.1 second
-local _srs = false  -- SRS send every 0.2 second  <-- srs handles other exports
-local _helios = false  -- HELIOS send every 0.1 second
-
-local limit_step = 0
-
-
--- function LuaExportAfterNextFrame()
---  	export_units = LoGetWorldObjects()
--- end
 
 
 function LuaExportActivityNextEvent(t)
@@ -510,7 +544,7 @@ function LuaExportActivityNextEvent(t)
 	end
     
 		
-	tNext = tNext + 0.01  -- test interval
+	tNext = tNext + 0.001
 	return tNext
 end
 

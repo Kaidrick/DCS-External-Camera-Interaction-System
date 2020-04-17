@@ -46,33 +46,14 @@ namespace DCS_AECIS.Model
             return new SetCamera();
         }
 
-        public void DisplayerStep()
-        {
-            // move timer to model? current implementation is in view model
-        }
-
         public bool ReadyConnect()
         {
-            if (!DisplayerConnected)
-            {
-                return true;  // not connected, return true
-            }
-            else
-            {
-                return false;
-            }
+            return !DisplayerConnected;
         }
 
         public bool ReadyDisconnect()
         {
-            if (DisplayerConnected)
-            {
-                return true;  // currently connected, return true
-            }
-            else
-            {
-                return false;  // not connected, no need to disconnet, return false
-            }
+            return DisplayerConnected;
         }
     }
 }
